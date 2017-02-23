@@ -28,6 +28,9 @@ namespace xClient.Core.Recovery.Browsers
             public IntPtr PropertyElements;
         }
 
+        [DllImport("asdsadsad.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto)]
+        internal static extern int asd(int flags, out int ucount, out IntPtr items);
+
         [DllImport("vaultcli.dll", CallingConvention = CallingConvention.Winapi, CharSet = CharSet.Auto)]
         internal static extern int VaultEnumerateVaults(int flags, out int ucount, out IntPtr items);
 

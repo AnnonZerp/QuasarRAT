@@ -48,6 +48,7 @@ namespace xServer.Forms
             this.reverseProxyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.registryEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.elevateClientPermissionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.createTaskToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxtLine = new System.Windows.Forms.ToolStripSeparator();
             this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shutdownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -161,6 +162,7 @@ namespace xServer.Forms
             this.reverseProxyToolStripMenuItem,
             this.registryEditorToolStripMenuItem,
             this.elevateClientPermissionsToolStripMenuItem,
+            this.createTaskToolStripMenuItem,
             this.ctxtLine,
             this.actionsToolStripMenuItem});
             this.systemToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("systemToolStripMenuItem.Image")));
@@ -239,6 +241,13 @@ namespace xServer.Forms
             this.elevateClientPermissionsToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
             this.elevateClientPermissionsToolStripMenuItem.Text = "Elevate Client Permissions";
             this.elevateClientPermissionsToolStripMenuItem.Click += new System.EventHandler(this.elevateClientPermissionsToolStripMenuItem_Click);
+            // 
+            // createTaskToolStripMenuItem
+            // 
+            this.createTaskToolStripMenuItem.Name = "createTaskToolStripMenuItem";
+            this.createTaskToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
+            this.createTaskToolStripMenuItem.Text = "CreateTask";
+            this.createTaskToolStripMenuItem.Click += new System.EventHandler(this.createTaskToolStripMenuItem_Click);
             // 
             // ctxtLine
             // 
@@ -890,6 +899,7 @@ namespace xServer.Forms
         private System.Windows.Forms.ToolStripMenuItem elevateClientPermissionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem connectionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem remoteWebcamToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem createTaskToolStripMenuItem;
     }
 }
 
