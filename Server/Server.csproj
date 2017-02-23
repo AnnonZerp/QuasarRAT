@@ -613,6 +613,7 @@
     <None Include="images\folder_go.png" />
     <None Include="images\add.png" />
     <None Include="images\archive.png" />
+    <None Include="images\clock.png" />
     <Content Include="Quasar_Server.ico" />
     <None Include="Resources\search.bmp" />
   </ItemGroup>
