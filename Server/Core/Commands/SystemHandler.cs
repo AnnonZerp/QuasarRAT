@@ -221,11 +221,14 @@ namespace xServer.Core.Commands
                                         if (client.Value == null || client.Value.FrmFm == null)
                                             break;
 
-                                        client.Value.FrmFm.AddItemToSearchResults(curPacket.Files[i],
-                                            FileHelper.GetDataSize(curPacket.FilesSize[i]), curPacket.Folders[i],
-                                            FileHelper.GetFileIcon(Path.GetExtension(curPacket.Files[i])),
-                                            curPacket.LastModificationDates[i], curPacket.CreationDates[i]);
-                                        client.Value.FrmFm.SetStatus("Searching");
+                                        try
+                                        {
+                                            client.Value.FrmFm.AddItemToSearchResults(curPacket.Files[i],
+                                                FileHelper.GetDataSize(curPacket.FilesSize[i]), curPacket.Folders[i],
+                                                FileHelper.GetFileIcon(Path.GetExtension(curPacket.Files[i])),
+                                                curPacket.LastModificationDates[i], curPacket.CreationDates[i]);
+                                            client.Value.FrmFm.SetStatus("Searching");
+                                        } catch { }
                                     }
                                 }
                             }

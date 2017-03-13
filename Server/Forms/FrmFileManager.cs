@@ -1126,13 +1126,13 @@ namespace xServer.Forms
             }
         }
 
-        private struct UploadInformation
+        private class UploadInformation
         {
-            public string LocalPath { get; private set; }
-            public string RemotePath { get; private set; }
-            public bool IsFile { get; private set; }
-            public int StartBlock { get; private set; }
-            public int TransferId { get; private set; }
+            public string LocalPath { get; set; }
+            public string RemotePath { get; set; }
+            public bool IsFile { get; set; }
+            public int StartBlock { get; set; }
+            public int TransferId { get; set; }
 
             public UploadInformation(string localPath, string remotePath, bool isFile, int startBlock = 0, int transferId = 0)
             {
