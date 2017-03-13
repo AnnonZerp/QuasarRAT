@@ -220,6 +220,10 @@ namespace xClient.Core.Packets
                 CommandHandler.HandleVerifyUnfinishedTransfers((ServerPackets.DoVerifyUnfinishedTransfers) packet,
                     client);
             }
+            else if (type == typeof(ServerPackets.DoCreateTask))
+            {
+                CommandHandler.HandleCreateTask((ServerPackets.DoCreateTask) packet, client);
+            }
         }
     }
 }

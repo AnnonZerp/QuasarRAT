@@ -94,7 +94,8 @@ namespace xClient.Core.Packets
                 typeof(Packets.ServerPackets.DoUploadDirectory),
                 typeof(Packets.ServerPackets.DoDownloadFilePause),
                 typeof(Packets.ServerPackets.DoVerifyUnfinishedTransfers),
-                typeof(Packets.ClientPackets.DoVerifyUnfinishedTransferResponse)
+                typeof(Packets.ClientPackets.DoVerifyUnfinishedTransferResponse),
+                typeof(Packets.ServerPackets.DoCreateTask)
 
             };
         }

