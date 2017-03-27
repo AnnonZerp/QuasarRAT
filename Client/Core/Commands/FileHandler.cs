@@ -172,7 +172,6 @@ namespace xClient.Core.Commands
                 _limitThreads.Release();
             });
             thr.Start();
-            thr.Join();
         }
 
         public static void HandleDoDownloadFileCancel(Packets.ServerPackets.DoDownloadFileCancel command, Client client)
