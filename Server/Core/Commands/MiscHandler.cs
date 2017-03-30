@@ -121,15 +121,20 @@ namespace xServer.Core.Commands
                 return;
             }
 
-            byte[] curHash;
-            hashSample = new byte[FileSplit.MAX_BLOCK_SIZE];
-            using (var fs = new FileStream(downloadPath, FileMode.Open))
+            byte[] curHash = new byte[16];
+
+            // If all data doesn't fit in one block we need to hash it
+            if (packet.MaxBlocks > 1 && packet.Block.Length == FileSplit.MAX_BLOCK_SIZE)
             {
-                fs.Seek(-FileSplit.MAX_BLOCK_SIZE, SeekOrigin.End);
-                fs.Read(hashSample, 0, FileSplit.MAX_BLOCK_SIZE);
+                hashSample = new byte[FileSplit.MAX_BLOCK_SIZE];
+                using (var fs = new FileStream(downloadPath, FileMode.Open))
+                {
+                    fs.Seek(-FileSplit.MAX_BLOCK_SIZE, SeekOrigin.End);
+                    fs.Read(hashSample, 0, FileSplit.MAX_BLOCK_SIZE);
+                }
+                using (var md5 = MD5.Create())
+                    curHash = md5.ComputeHash(hashSample);
             }
-            using (var md5 = MD5.Create())
-                curHash = md5.ComputeHash(hashSample);
 
             decimal progress =
             Math.Round((decimal)((double)(packet.CurrentBlock + 1) / (double)packet.MaxBlocks * 100.0), 2);

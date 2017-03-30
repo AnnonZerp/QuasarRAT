@@ -1021,10 +1021,18 @@ namespace xServer.Forms
                         byte[] hashSample = new byte[FileSplit.MAX_BLOCK_SIZE];
                         byte[] hash;
 
-                        using (var fs = new FileStream(file2, FileMode.Open))
+                        try
                         {
-                            fs.Seek(-FileSplit.MAX_BLOCK_SIZE, SeekOrigin.End);
-                            fs.Read(hashSample, 0, FileSplit.MAX_BLOCK_SIZE);
+                            using (var fs = new FileStream(file2, FileMode.Open))
+                            {
+                                fs.Seek(-FileSplit.MAX_BLOCK_SIZE, SeekOrigin.End);
+                                fs.Read(hashSample, 0, FileSplit.MAX_BLOCK_SIZE);
+                            }
+                        }
+                        // If the file is in use we might get an exception here
+                        catch
+                        {
+                            continue;
                         }
                         using (var md5 = MD5.Create())
                             hash = md5.ComputeHash(hashSample);
