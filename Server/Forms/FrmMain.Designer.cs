@@ -48,7 +48,6 @@ namespace xServer.Forms
             this.reverseProxyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.registryEditorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.elevateClientPermissionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createTaskToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ctxtLine = new System.Windows.Forms.ToolStripSeparator();
             this.actionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shutdownToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -67,6 +66,14 @@ namespace xServer.Forms
             this.showMessageboxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lineToolStripMenuItem = new System.Windows.Forms.ToolStripSeparator();
             this.selectAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.groupByToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tagToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.countryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.operatingSystemToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.accountTypeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.userStatusToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.unGroupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.imgFlags = new System.Windows.Forms.ImageList(this.components);
             this.notifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
@@ -102,9 +109,10 @@ namespace xServer.Forms
             this.surveillanceToolStripMenuItem,
             this.miscellaneousToolStripMenuItem,
             this.lineToolStripMenuItem,
-            this.selectAllToolStripMenuItem});
+            this.selectAllToolStripMenuItem,
+            this.groupByToolStripMenuItem});
             this.contextMenuStrip.Name = "ctxtMenu";
-            this.contextMenuStrip.Size = new System.Drawing.Size(150, 120);
+            this.contextMenuStrip.Size = new System.Drawing.Size(153, 164);
             // 
             // connectionToolStripMenuItem
             // 
@@ -115,7 +123,7 @@ namespace xServer.Forms
             this.uninstallToolStripMenuItem});
             this.connectionToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("connectionToolStripMenuItem.Image")));
             this.connectionToolStripMenuItem.Name = "connectionToolStripMenuItem";
-            this.connectionToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.connectionToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.connectionToolStripMenuItem.Text = "Connection";
             // 
             // updateToolStripMenuItem
@@ -162,12 +170,11 @@ namespace xServer.Forms
             this.reverseProxyToolStripMenuItem,
             this.registryEditorToolStripMenuItem,
             this.elevateClientPermissionsToolStripMenuItem,
-            this.createTaskToolStripMenuItem,
             this.ctxtLine,
             this.actionsToolStripMenuItem});
             this.systemToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("systemToolStripMenuItem.Image")));
             this.systemToolStripMenuItem.Name = "systemToolStripMenuItem";
-            this.systemToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.systemToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.systemToolStripMenuItem.Text = "System";
             // 
             // systemInformationToolStripMenuItem
@@ -242,14 +249,6 @@ namespace xServer.Forms
             this.elevateClientPermissionsToolStripMenuItem.Text = "Elevate Client Permissions";
             this.elevateClientPermissionsToolStripMenuItem.Click += new System.EventHandler(this.elevateClientPermissionsToolStripMenuItem_Click);
             // 
-            // createTaskToolStripMenuItem
-            // 
-            this.createTaskToolStripMenuItem.Image = global::xServer.Properties.Resources.clock;
-            this.createTaskToolStripMenuItem.Name = "createTaskToolStripMenuItem";
-            this.createTaskToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
-            this.createTaskToolStripMenuItem.Text = "Create Task";
-            this.createTaskToolStripMenuItem.Click += new System.EventHandler(this.createTaskToolStripMenuItem_Click);
-            // 
             // ctxtLine
             // 
             this.ctxtLine.Name = "ctxtLine";
@@ -270,7 +269,7 @@ namespace xServer.Forms
             // 
             this.shutdownToolStripMenuItem.Image = global::xServer.Properties.Resources.shutdown;
             this.shutdownToolStripMenuItem.Name = "shutdownToolStripMenuItem";
-            this.shutdownToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.shutdownToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.shutdownToolStripMenuItem.Text = "Shutdown";
             this.shutdownToolStripMenuItem.Click += new System.EventHandler(this.shutdownToolStripMenuItem_Click);
             // 
@@ -278,7 +277,7 @@ namespace xServer.Forms
             // 
             this.restartToolStripMenuItem.Image = global::xServer.Properties.Resources.restart;
             this.restartToolStripMenuItem.Name = "restartToolStripMenuItem";
-            this.restartToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.restartToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.restartToolStripMenuItem.Text = "Restart";
             this.restartToolStripMenuItem.Click += new System.EventHandler(this.restartToolStripMenuItem_Click);
             // 
@@ -286,7 +285,7 @@ namespace xServer.Forms
             // 
             this.standbyToolStripMenuItem.Image = global::xServer.Properties.Resources.standby;
             this.standbyToolStripMenuItem.Name = "standbyToolStripMenuItem";
-            this.standbyToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.standbyToolStripMenuItem.Size = new System.Drawing.Size(128, 22);
             this.standbyToolStripMenuItem.Text = "Standby";
             this.standbyToolStripMenuItem.Click += new System.EventHandler(this.standbyToolStripMenuItem_Click);
             // 
@@ -299,7 +298,7 @@ namespace xServer.Forms
             this.keyloggerToolStripMenuItem});
             this.surveillanceToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("surveillanceToolStripMenuItem.Image")));
             this.surveillanceToolStripMenuItem.Name = "surveillanceToolStripMenuItem";
-            this.surveillanceToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.surveillanceToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.surveillanceToolStripMenuItem.Text = "Surveillance";
             // 
             // remoteDesktopToolStripMenuItem
@@ -342,7 +341,7 @@ namespace xServer.Forms
             this.showMessageboxToolStripMenuItem});
             this.miscellaneousToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("miscellaneousToolStripMenuItem.Image")));
             this.miscellaneousToolStripMenuItem.Name = "miscellaneousToolStripMenuItem";
-            this.miscellaneousToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.miscellaneousToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.miscellaneousToolStripMenuItem.Text = "Miscellaneous";
             // 
             // remoteExecuteToolStripMenuItem
@@ -390,14 +389,75 @@ namespace xServer.Forms
             // lineToolStripMenuItem
             // 
             this.lineToolStripMenuItem.Name = "lineToolStripMenuItem";
-            this.lineToolStripMenuItem.Size = new System.Drawing.Size(146, 6);
+            this.lineToolStripMenuItem.Size = new System.Drawing.Size(149, 6);
             // 
             // selectAllToolStripMenuItem
             // 
             this.selectAllToolStripMenuItem.Name = "selectAllToolStripMenuItem";
-            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(149, 22);
+            this.selectAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.selectAllToolStripMenuItem.Text = "Select All";
             this.selectAllToolStripMenuItem.Click += new System.EventHandler(this.selectAllToolStripMenuItem_Click);
+            // 
+            // groupByToolStripMenuItem
+            // 
+            this.groupByToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tagToolStripMenuItem,
+            this.countryToolStripMenuItem,
+            this.operatingSystemToolStripMenuItem,
+            this.accountTypeToolStripMenuItem,
+            this.userStatusToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.unGroupToolStripMenuItem});
+            this.groupByToolStripMenuItem.Name = "groupByToolStripMenuItem";
+            this.groupByToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.groupByToolStripMenuItem.Text = "Group By";
+            // 
+            // tagToolStripMenuItem
+            // 
+            this.tagToolStripMenuItem.Name = "tagToolStripMenuItem";
+            this.tagToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.tagToolStripMenuItem.Text = "Tag";
+            this.tagToolStripMenuItem.Click += new System.EventHandler(this.tagToolStripMenuItem_Click);
+            // 
+            // countryToolStripMenuItem
+            // 
+            this.countryToolStripMenuItem.Name = "countryToolStripMenuItem";
+            this.countryToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.countryToolStripMenuItem.Text = "Country";
+            this.countryToolStripMenuItem.Click += new System.EventHandler(this.countryToolStripMenuItem_Click);
+            // 
+            // operatingSystemToolStripMenuItem
+            // 
+            this.operatingSystemToolStripMenuItem.Name = "operatingSystemToolStripMenuItem";
+            this.operatingSystemToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.operatingSystemToolStripMenuItem.Text = "Operating System";
+            this.operatingSystemToolStripMenuItem.Click += new System.EventHandler(this.operatingSystemToolStripMenuItem_Click);
+            // 
+            // accountTypeToolStripMenuItem
+            // 
+            this.accountTypeToolStripMenuItem.Name = "accountTypeToolStripMenuItem";
+            this.accountTypeToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.accountTypeToolStripMenuItem.Text = "Account Type";
+            this.accountTypeToolStripMenuItem.Click += new System.EventHandler(this.accountTypeToolStripMenuItem_Click);
+            // 
+            // userStatusToolStripMenuItem
+            // 
+            this.userStatusToolStripMenuItem.Name = "userStatusToolStripMenuItem";
+            this.userStatusToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.userStatusToolStripMenuItem.Text = "User Status";
+            this.userStatusToolStripMenuItem.Click += new System.EventHandler(this.userStatusToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(165, 6);
+            // 
+            // unGroupToolStripMenuItem
+            // 
+            this.unGroupToolStripMenuItem.Name = "unGroupToolStripMenuItem";
+            this.unGroupToolStripMenuItem.Size = new System.Drawing.Size(168, 22);
+            this.unGroupToolStripMenuItem.Text = "Un-Group";
+            this.unGroupToolStripMenuItem.Click += new System.EventHandler(this.unGroupToolStripMenuItem_Click);
             // 
             // imgFlags
             // 
@@ -900,7 +960,14 @@ namespace xServer.Forms
         private System.Windows.Forms.ToolStripMenuItem elevateClientPermissionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem connectionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem remoteWebcamToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem createTaskToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem groupByToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tagToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem countryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem operatingSystemToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem accountTypeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem userStatusToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem unGroupToolStripMenuItem;
     }
 }
 
